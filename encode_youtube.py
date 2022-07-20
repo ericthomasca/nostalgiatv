@@ -30,8 +30,9 @@ def main():
         (
             ffmpeg
             .input(input_video)
-            .filter('scale', 480, -1)
-            .crop(107, 480, 640, 480)
+            .filter('scale', 640, -1)
+            # .crop(107, 0, 640, 480)
+            # TODO figure out how to crop
             .output(output_video)
             .run()
         )
