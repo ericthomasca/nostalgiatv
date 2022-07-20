@@ -1,7 +1,5 @@
-from __future__ import unicode_literals
 import os
-import sys
-import youtube_dl
+import yt_dlp
 import ffmpeg
 
 
@@ -13,7 +11,7 @@ def main():
         'restrictfilenames': True
     }
 
-    ytdl = youtube_dl.YoutubeDL(yt_opts)
+    ytdl = yt_dlp.YoutubeDL(yt_opts)
 
     video_link = ['https://www.youtube.com/watch?v=-qQ_HGJqaHQ']
 
@@ -24,18 +22,19 @@ def main():
     encoded_dir = 'videos/encoded'
 
     for filename in os.listdir(original_dir):
-        input_video = os.path.join(original_dir, filename)
-        output_video = os.path.join(encoded_dir, filename)
+        input_video = os.path.join(original_dir, filename).replace('\\', '/')
+        output_video = os.path.join(encoded_dir, filename).replace('\\', '/')
+        print(input_video)
+        # output_video = os.path.join(encoded_dir, filename)
 
-        if os.path.isfile(input_video):
-            (
-                ffmpeg
-                .input(input_video)
-                .filter('scale', 480, -1)
-                .crop(107, 480, 640, 480)
-                .output(output_video)
-                .run()
-            )
+        (
+            ffmpeg
+            .input(input_video)
+            .filter('scale', 480, -1)
+            .crop(107, 480, 640, 480)
+            .output(output_video)
+            .run()
+        )
 
     # Delete Originals
 
