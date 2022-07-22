@@ -23,18 +23,22 @@ def main():
     for filename in os.listdir(original_dir):
         input_video = os.path.join(original_dir, filename)
         output_video = os.path.join(encoded_dir, filename)
+
         input_video_probe = ffmpeg.probe(input_video)['streams'][0]
+        print(input_video_probe)
+        aspect_ratio = input_video_probe['display_aspect_ratio']
         input_width = input_video_probe['width']
         input_height = input_video_probe['height']
-        aspect_ratio = input_video_probe['display_aspect_ratio']
-        print(aspect_ratio)
+        output_width = input_height * 4 / 3
+        output_height = input_height
+        black_bar_width = (input_width - output_width) / 2
+
         if aspect_ratio == '16:9':
             (
                 ffmpeg
                 .input(input_video)
-                .crop(160, 0, 960, 720)  # Remove black bars from left and right
-                # TODO add math to auto crop regardless of resolution
-                .filter('scale', 640, -1)  # Scale to 640x480
+                .crop(black_bar_width, 0, output_width, output_height)  # Remove black bars
+                .filter('scale', 640, -1)  # Resize to 640x480
                 .output(output_video)
                 .run(overwrite_output=True)
             )
@@ -42,7 +46,7 @@ def main():
             (
                 ffmpeg
                 .input(input_video)
-                .filter('scale', 640, -1)
+                .filter('scale', 640, -1)  # Resize to 640x480
                 .output(output_video)
                 .run(overwrite_output=True)
             )
