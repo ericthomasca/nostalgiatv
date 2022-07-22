@@ -23,18 +23,30 @@ def main():
 
     for filename in os.listdir(original_dir):
         input_video = os.path.join(original_dir, filename)
-        # print(ffmpeg.probe(input_video))
         output_video = os.path.join(encoded_dir, filename)
-        (
-            ffmpeg
-            .input(input_video)
-            .crop(160, 0, 960, 720)  # Remove black bars
-            .filter('scale', 640, -1)  # Add scaling when target resolution is known
-            .output(output_video)
-            .run(overwrite_output=True)
-        )
+        aspect_ratio = ffmpeg.probe(input_video)['streams'][0]['display_aspect_ratio']
+        print(aspect_ratio)
+        if aspect_ratio == '16:9':
+            (
+                ffmpeg
+                .input(input_video)
+                .crop(160, 0, 960, 720)  # Remove black bars from left and right
+                .filter('scale', 640, -1)
+                .output(output_video)
+                .run(overwrite_output=True)
+            )
+        elif aspect_ratio == '4:3':
+            (
+                ffmpeg
+                .input(input_video)
+                .filter('scale', 640, -1)
+                .output(output_video)
+                .run(overwrite_output=True)
+            )
+        else:
+            print('Can\'t process video. Aspect ratio needs to be 16:9 or 4:3')
 
-        del input_video
+        os.remove(input_video)
 
 
 if __name__ == '__main__':
