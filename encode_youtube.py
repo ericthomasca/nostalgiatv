@@ -6,7 +6,7 @@ import ffmpeg
 def main():
     # Get Videos
     yt_opts = {
-        'format': '22',  # 720p
+        'format': 'best',  # 720p
         'outtmpl': 'videos/original/%(title)s.%(ext)s',
         'restrictfilenames': True
     }
@@ -14,7 +14,7 @@ def main():
     ytdl = yt_dlp.YoutubeDL(yt_opts)
 
     # TODO change to argument
-    video_link = ['https://www.youtube.com/watch?v=-qQ_HGJqaHQ']
+    video_link = ['https://www.youtube.com/watch?v=D3RbMtyv9r8']
     ytdl.download(video_link)
 
     # Convert Video
@@ -24,14 +24,18 @@ def main():
     for filename in os.listdir(original_dir):
         input_video = os.path.join(original_dir, filename)
         output_video = os.path.join(encoded_dir, filename)
-        aspect_ratio = ffmpeg.probe(input_video)['streams'][0]['display_aspect_ratio']
+        input_video_probe = ffmpeg.probe(input_video)['streams'][0]
+        input_width = input_video_probe['width']
+        input_height = input_video_probe['height']
+        aspect_ratio = input_video_probe['display_aspect_ratio']
         print(aspect_ratio)
         if aspect_ratio == '16:9':
             (
                 ffmpeg
                 .input(input_video)
                 .crop(160, 0, 960, 720)  # Remove black bars from left and right
-                .filter('scale', 640, -1)
+                # TODO add math to auto crop regardless of resolution
+                .filter('scale', 640, -1)  # Scale to 640x480
                 .output(output_video)
                 .run(overwrite_output=True)
             )
