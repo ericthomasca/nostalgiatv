@@ -1,7 +1,7 @@
 import os
+import sys
 import yt_dlp
 import ffmpeg
-import sys
 
 
 def main():
