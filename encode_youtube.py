@@ -1,6 +1,7 @@
 import os
 import yt_dlp
 import ffmpeg
+import sys
 
 
 def main():
@@ -12,9 +13,7 @@ def main():
     }
 
     ytdl = yt_dlp.YoutubeDL(yt_opts)
-
-    # TODO change to argument
-    video_link = ['https://www.youtube.com/watch?v=D3RbMtyv9r8']
+    video_link = [sys.argv[1]]
     ytdl.download(video_link)
 
     # Convert Video
